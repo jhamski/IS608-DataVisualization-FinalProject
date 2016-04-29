@@ -2,6 +2,7 @@ library(readxl)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(zoo)
 
 microdata <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Data', na = "NA", skip = 1)
 colnames(microdata)[189] <- "_HH_INC_CAT2"
@@ -17,7 +18,10 @@ column.key <- cbind(column.key$Question, column.key$Description)
 # Data prep for Final Project
 #############################
 
-microdata$date <- as.Date(microdata$date, origin = "1900-01-01", format = "%Y%m") 
+microdata <- microdata[!is.na(microdata$date),]
+microdata$date <- as.character(microdata$date)
+
+microdata$date <- as.Date(as.yearmon(microdata$date, "%Y%m"), frac= 1) 
 
 education.levels <- c("Less than high school",
                       "High school dipoma/equivalent",
@@ -69,4 +73,12 @@ write_delim(d3.dataset, path = 'consumer_expectations.csv', delim = ',')
 ####################################
 
 d3.dataset.2 <- microdata %>%
-  select(date, Q25v2part2, Q26v2part2)
+  select(date, Q25v2part2, Q26v2part2) %>%
+  filter(Q25v2part2 < 100) %>%
+  filter(Q25v2part2 > - 100) 
+
+d3.dataset.2$month <- format(d3.dataset.2$date, format="%m")
+d3.dataset.2$year <- format(d3.dataset.2$date, format="%y")
+aggregate(Q25v2part2 ~ month + year, d3.dataset.2, mean)
+
+d3 <- ggplot(d3.dataset.2, aes(x=date, y=Q25v2part2)) + geom_line()
