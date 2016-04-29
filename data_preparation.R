@@ -13,9 +13,9 @@ column.key <- cbind(column.key$Question, column.key$Description)
 #View(column.key)
 
 
-############################
+#############################
 # Data prep for Final Project
-############################
+#############################
 
 microdata$date <- as.Date(microdata$date, origin = "1900-01-01", format = "%Y%m") 
 
@@ -63,3 +63,10 @@ colnames(d3.dataset) <- c("age", "education", "income_expectation","chance_leave
 ggplot(data = d3.dataset, aes(age, income_expectation, size = chance_leave_job)) + geom_point(aes(color=factor(education)))
 
 write_delim(d3.dataset, path = 'consumer_expectations.csv', delim = ',')
+
+####################################
+# Data prep for d3 assignment part 2
+####################################
+
+d3.dataset.2 <- microdata %>%
+  select(date, Q25v2part2, Q26v2part2)
