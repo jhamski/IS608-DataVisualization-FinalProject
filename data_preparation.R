@@ -7,9 +7,9 @@ library(zoo)
 microdata <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Data', na = "NA", skip = 1)
 colnames(microdata)[189] <- "_HH_INC_CAT2"
 
-column.key <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Codebook', skip = 1)
+#column.key <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Codebook', skip = 1)
 
-column.key <- cbind(column.key$Question, column.key$Description)
+#column.key <- cbind(column.key$Question, column.key$Description)
 
 #View(column.key)
 
@@ -79,6 +79,6 @@ d3.dataset.2 <- microdata %>%
 
 d3.dataset.2$month <- format(d3.dataset.2$date, format="%m")
 d3.dataset.2$year <- format(d3.dataset.2$date, format="%y")
-aggregate(Q25v2part2 ~ month + year, d3.dataset.2, mean)
+d3.dataset.2 <-  aggregate(Q25v2part2 ~ month + year, d3.dataset.2, mean)
 
-d3 <- ggplot(d3.dataset.2, aes(x=date, y=Q25v2part2)) + geom_line()
+write_delim(d3.dataset.2, path = 'consumer_expectations_2.csv', delim = ',')
