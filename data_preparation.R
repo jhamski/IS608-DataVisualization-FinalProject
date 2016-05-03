@@ -49,22 +49,20 @@ microdata$Q2 <- factor(microdata$Q2, levels = 1:5, labels = better.worse)
 # Data prep for d3 assignment
 ############################
 
-set.seed(56498)
-
+microdata$year <- format(microdata$date, format = "%m")
+#state doesn't make sense, do something else
 d3.dataset <- microdata %>%
-  select(Q32, Q36, Q23v2, Q23v2part2, Q14new) %>%
+  select(Q36, `_STATE`, Q25v2part2, year) %>%
+  filter(Q25v2part2 < 100) %>%
+  filter(Q25v2part2 > - 100) %>%
   na.omit() %>%
-  filter(Q23v2 %in% c(1,2)) %>%
-  select(Q32, Q36, Q23v2part2, Q14new) %>%
-  filter(Q32 < 100) %>%
-  filter(Q23v2part2 < 50) %>%
-  filter(Q36 %in% c(5,6)) %>%
-  group_by(Q36) %>%
-  sample_n(100)
+  group_by(year, `_STATE`) %>%
+  summarize(mean(Q25v2part2))
+  
 
-colnames(d3.dataset) <- c("age", "education", "income_expectation","chance_leave_job")
+colnames(d3.dataset) <- c("education", "mean_income_expectation")
 
-ggplot(data = d3.dataset, aes(age, income_expectation, size = chance_leave_job)) + geom_point(aes(color=factor(education)))
+ggplot(data = d3.dataset, aes(education, mean_income_expectation)) + geom_bar(stat="identity")
 
 write_delim(d3.dataset, path = 'consumer_expectations.csv', delim = ',')
 
