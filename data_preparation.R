@@ -56,11 +56,11 @@ d3.dataset <- microdata %>%
   filter(Q25v2part2 < 100) %>%
   filter(Q25v2part2 > - 100) %>%
   na.omit() %>%
-  group_by(year, `_STATE`) %>%
+  group_by(Q36) %>%
   summarize(mean(Q25v2part2))
   
 
-colnames(d3.dataset) <- c("education", "mean_income_expectation")
+colnames(d3.dataset) <- c("education",  "mean_income_expectation")
 
 ggplot(data = d3.dataset, aes(education, mean_income_expectation)) + geom_bar(stat="identity")
 
