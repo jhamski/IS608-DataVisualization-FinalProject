@@ -8,9 +8,13 @@
 #
 
 library(shiny)
+library(shinythemes)
+
+
+load("project_data.Rda")
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme = shinytheme("cosmo"),
   
   # Application title
   titlePanel("Old Faithful Geyser Data"),
@@ -18,11 +22,10 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
+      selectInput("select", label = h3("Select box"), 
+                  choices = list("Financially better or worse off than 12 months ago" = "Fin.better.worse.ago.1",
+                                 "Financially better or worse off 12 months from now" = "Fin.better.worse.from.now.2"),
+                  )
     ),
     
     # Show a plot of the generated distribution

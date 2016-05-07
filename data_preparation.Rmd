@@ -54,6 +54,8 @@ project$Fin.better.worse.from.now.2 <- factor(microdata$Q2, levels = 1:5, labels
 ```
 
 
+
+
 ```{r}
 harder.easier <- c("much harder",
                  "somewhat harder",
@@ -140,6 +142,16 @@ project$total.income.47 <- factor(microdata$Q47, levels = 1:length(incomes), lab
 ```
 
 ```{r}
+project$numeracy <- as.factor(microdata$`_NUM_CAT`)
+```
 
+```{r}
+project$year <- format(project$date, format = "%y")
+project$month <- format(project$date, format = "%m")
+```
+
+
+```{r}
+save(project, file = "ConsumerExpectationsExplorer/project_data.Rda")
 ```
 

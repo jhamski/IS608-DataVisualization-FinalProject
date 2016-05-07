@@ -1,0 +1,56 @@
+---
+title: "Project Data Preparation"
+author: "J. Hamski"
+date: "May 7, 2016"
+output: html_document
+---
+
+```{r}
+# data tidying
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(zoo)
+# test graphs
+library(ggplot2)
+```
+
+Goal: a 'long' data frame with three columns:
+(1) date (2) demographic (3) observation
+
+```{r}
+demo.data.inflation <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations', na = "NA", skip = 3)
+
+# to do - copy all column names to a column to label this one since its different than demographs
+
+demo.data.inflation$date <- demo.data.inflation$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1) 
+```
+
+```{r}
+demo.data <- demo.data.inflation %>% gather("survey", "results", 2:9)
+```
+
+```{r}
+demo.data.inflation.demo <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations Demo', na = "NA", skip = 3)
+# this tab has essentially two tables side by side
+demo.data.inflation.demo.1yr <- demo.data.inflation.demo[1:16]
+demo.data.inflation.demo.3yr <- demo.data.inflation.demo[18:33]
+
+demo.data.inflation.demo.1yr$date <- demo.data.inflation.demo$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+demo.data.inflation.demo.3yr$date <- demo.data.inflation.demo$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+```
+
+```{r}
+
+```
+
