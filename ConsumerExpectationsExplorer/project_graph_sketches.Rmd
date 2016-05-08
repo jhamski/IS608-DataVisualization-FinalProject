@@ -1,0 +1,36 @@
+---
+title: "Project graph sketches"
+author: "J. Hamski"
+date: "May 8, 2016"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+load("data_demo.Rda")
+load("data_all.Rda")
+```
+
+```{r}
+data.all$survey <- as.factor(data.all$survey)
+```
+
+
+```{r}
+survey.input = "Median one-year ahead expected inflation rate"
+demo.input.question = "Median One Year Ahead Inflation Rate Expectation"
+demo.input.demo = "Education High School or Less"
+
+#values <- c("All Respondents" = "blue", demo.input.demo[1] = "red")
+
+ggplot() + 
+  geom_line(data =  filter(data.all, survey == survey.input), aes(x = date, y = results, color = "All Respondents")) + 
+  geom_line(data =  filter(data.demo, Question == demo.input.question & Demographic == demo.input.demo), aes(x = date, y = results, color = as.character(demo.input.demo))) + 
+  scale_color_manual(values = c("blue", "red"))
+
+```
+

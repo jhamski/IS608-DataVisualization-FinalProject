@@ -1,56 +1,46 @@
+
 library(shiny)
-library(shinydashboard)
-library(shinythemes)
 library(ggplot2)
-library(dplyr)
 
-#load("project_data.Rda")
+load("data_demo.Rda")
+load("data_all.Rda")
 
-# ui
-header <- dashboardHeader(disable = TRUE)
 
-sidebar <- dashboardSidebar(
-  sidebarMenu(
-    menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-    menuItem("Widgets", tabName = "widgets", icon = icon("th"))
-  )
-)
+# Define UI for application that draws a histogram
+ui <- shinyUI(fluidPage(
+   
+   # Application title
+   titlePanel("NYFRB Consumer Expectations Survey"),
+   
+   # Sidebar with a slider input for number of bins 
+   sidebarLayout(
+      sidebarPanel(
+        selectInput("survey", label = h5("Survey Question"), 
+                    choices = choices.1),
+        selectInput("question", label = h5("Survey Question for Demographic Slice"), 
+                    choices = unique(data.demo$Question)),
+        selectInput("demo", label = h5("Demographic Slice"), 
+                    choices = unique(data.demo$Demographic))
+      ),
+      
+      # Show a plot of the generated distribution
+      mainPanel(
+         plotOutput("distPlot")
+      )
+   )
+))
 
-body <- dashboardBody(
-  tabItems(
-    # First tab content
-    tabItem(tabName = "dashboard",
-            fluidRow(
-              box(plotOutput("plot1", height = 250)),
-              
-              box(
-                title = "Controls",
-                sliderInput("slider", "Number of observations:", 1, 100, 50)
-              )
-            )
-    ),
-    
-    # Second tab content
-    tabItem(tabName = "widgets",
-            h2("Widgets tab content")
-    )
-  )
-)
-
-ui <- dashboardPage(header, sidebar, body, theme='united')
-
-# server
+# Define server logic required to draw a histogram
 server <- shinyServer(function(input, output) {
-  set.seed(122)
-  histdata <- rnorm(500)
-  
-  output$plot1 <- renderPlot({
-    data <- histdata[seq_len(input$slider)]
-    hist(data)
-  })
-
-  
-#end server
+   
+   output$distPlot <- renderPlot({
+     ggplot() + 
+       geom_line(data =  filter(data.all, survey == input$survey), aes(x = date, y = results, color = input$survey)) + 
+       geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
+                 aes(x = date, y = results, color = as.character(input$demo))) + 
+       scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "Timeseries Displayed")) + 
+       theme(legend.position = "bottom")
+   })
 })
 
 # Run the application 

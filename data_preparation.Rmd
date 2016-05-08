@@ -152,6 +152,7 @@ project$month <- format(project$date, format = "%m")
 
 
 ```{r}
-save(project, file = "ConsumerExpectationsExplorer/project_data.Rda")
+project.microdata <- project
+save(project.microdata, file = "ConsumerExpectationsExplorer/project_micro_data.Rda")
 ```
 

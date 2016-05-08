@@ -21,8 +21,6 @@ Goal: a 'long' data frame with three columns:
 ```{r}
 demo.data.inflation <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations', na = "NA", skip = 3)
 
-# to do - copy all column names to a column to label this one since its different than demographs
-
 demo.data.inflation$date <- demo.data.inflation$date %>%
   as.character() %>%
   as.yearmon("%Y%m") %>%
@@ -30,27 +28,50 @@ demo.data.inflation$date <- demo.data.inflation$date %>%
 ```
 
 ```{r}
-demo.data <- demo.data.inflation %>% gather("survey", "results", 2:9)
+data.all <- demo.data.inflation %>% gather("survey", "results", 2:9)
 ```
 
 ```{r}
-demo.data.inflation.demo <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations Demo', na = "NA", skip = 3)
+data.demo.inflation <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations Demo', na = "NA", skip = 3)
 # this tab has essentially two tables side by side
-demo.data.inflation.demo.1yr <- demo.data.inflation.demo[1:16]
-demo.data.inflation.demo.3yr <- demo.data.inflation.demo[18:33]
+data.demo.inflation.1yr <- data.demo.inflation[1:16]
+data.demo.inflation.1yr$Question <- "Median One Year Ahead Inflation Rate Expectation"
+data.demo.inflation.3yr <- data.demo.inflation[17:32]
+data.demo.inflation.3yr$Question <- "Median Three Year Ahead Inflation Rate Expectation"
 
-demo.data.inflation.demo.1yr$date <- demo.data.inflation.demo$date %>%
+data.demo.inflation.1yr$date <- data.demo.inflation.1yr$date %>%
   as.character() %>%
   as.yearmon("%Y%m") %>%
   as.Date(frac = 1)
 
-demo.data.inflation.demo.3yr$date <- demo.data.inflation.demo$date %>%
+data.demo.inflation.3yr$date <- data.demo.inflation.3yr$date %>%
   as.character() %>%
   as.yearmon("%Y%m") %>%
   as.Date(frac = 1)
 ```
 
 ```{r}
+data.demo <- data.demo.inflation.1yr %>% gather("Demographic", "results", 2:16)
+data.demo <- rbind(data.demo, data.demo.inflation.3yr %>% gather("Demographic", "results", 2:16))
+```
+
+Could wrap these in a function and iterate through a list of all the tabs. *Don't repeat code*.
+```{r}
+demo.data.inflation.uncertainty <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation uncertainty', na = "NA", skip = 3)
+
+demo.data.inflation.uncertainty$date <- demo.data.inflation.uncertainty$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1) 
+```
+
+```{r}
+data.all <- rbind(data.all, demo.data.inflation.uncertainty %>% gather("survey", "results", 2:3))
+```
+
+```{r}
+save(data.all, file = "ConsumerExpectationsExplorer/data_all.Rda")
+save(data.demo, file = "ConsumerExpectationsExplorer/data_demo.Rda")
 
 ```
 
