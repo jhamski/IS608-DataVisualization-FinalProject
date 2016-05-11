@@ -36,7 +36,9 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
                     )
                   ),
             
-            
+            tabPanel("Microdata"
+                     
+                  ),
             
             tabPanel("More Information", fluidPage(
                        titlePanel("test")
@@ -64,7 +66,7 @@ server <- shinyServer(function(input, output, session) {
                  geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$Question)) + 
                  geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
                            aes(x = date, y = results, color = as.character(input$demo))) + 
-                 scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "Timeseries Displayed")) + 
+                 scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) + 
                  theme(legend.position = "bottom")
              })
 })
