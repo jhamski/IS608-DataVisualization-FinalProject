@@ -58,17 +58,17 @@ server <- shinyServer(function(input, output, session) {
             
             observe({
               updateSelectInput(session, "metric",
-                                choices = outVar()
-            )})
+                                choices = outVar())
+            })
                
-             output$demoPlot <- renderPlot({
-               ggplot() + 
-                 geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$Question)) + 
-                 geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
+            output$demoPlot <- renderPlot({
+              ggplot() + 
+                geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$Question)) + 
+                geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
                            aes(x = date, y = results, color = as.character(input$demo))) + 
-                 scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) + 
-                 theme(legend.position = "bottom")
-             })
+                scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) + 
+                theme(legend.position = "bottom")
+            })
 })
 
 # Run the application 
