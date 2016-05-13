@@ -40,7 +40,7 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
             tabPanel("Microdata",
                      fluidRow(
                        column(8, selectInput("Microdata_Question", label = h5("Select Microdata Parameter"), 
-                                             choices = unique(colnames(project.microdata))),
+                                             choices = unique(colnames(microdata))),
                        column(4, plotOutput("distribution"))
                      ),
                      
@@ -48,12 +48,17 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
                        column(12,
                               plotOutput("samplesPlot"))
                      )
-                  ),
+                  )
+                ),
+            
+            tabPanel("Analysis", fluidPage(
+              titlePanel("test")
+            )),
             
             tabPanel("More Information", fluidPage(
                        titlePanel("test")
-                      )
-                     ))
+            ))
+                     
             
   )
 )
@@ -80,16 +85,18 @@ server <- shinyServer(function(input, output, session) {
              })
              
              output$samplesPlot <- renderPlot({
-               ggplot(project.microdata %>%
+               ggplot(microdata %>%
                         filter(!is.na(input$Microdata_Question)) %>%
-                        select(date) %>%
-                        group_by(date) %>%
-                        count(date)) + 
-                 geom_bar(aes(x = date, y = n), stat = "identity")
+                        select(`Month Survey was administered`) %>%
+                        group_by(`Month Survey was administered`) %>%
+                        count(`Month Survey was administered`)) + 
+                 geom_bar(aes(x = `Month Survey was administered`, y = n), stat = "identity")
                
              })
              
-             #output$distribution 
+             output$distribution <- renderPlot({
+               ggplot(microdata) + geom_freqpoly(aes(input$Microdata_Question), stat="count")
+             })
 })
 
 # Run the application 

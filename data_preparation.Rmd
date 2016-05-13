@@ -43,8 +43,8 @@ colnames(microdata) <- fields$Description
 ```
 
 ```{r}
-microdata$`Month Survey was administered` <- as.character(microdata$`Month Survey was administered`)
-microdata$`Month Survey was administered` <- as.Date(as.yearmon(microdata$`Month Survey was administered`, "%Y%m"), frac = 1)
+microdata.original$date <- as.character(microdata.original$date)
+microdata$`Month Survey was administered` <- as.Date(as.yearmon(microdata.original$date, "%Y%m"), frac = 1)
 ```
 
 #### Column-spectific changes 

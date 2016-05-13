@@ -32,13 +32,13 @@ ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
 ```
 
 ```{r}
-ggplot(microdata) + geom_freqpoly(aes(`Change in taxes`), stat="count")
+ggplot(microdata) + geom_histogram(aes(`Financially better or worse off than 12 months ago`), stat="count")
 ```
 
 
 
 
-
+`Financially better or worse off than 12 months ago`
 
 
 
