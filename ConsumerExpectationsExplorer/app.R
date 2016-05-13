@@ -6,6 +6,7 @@ library(dplyr)
 
 load("data_demo.Rda")
 load("data_all.Rda")
+load("project_micro_data.Rda")
 
 # ----- UI ---------------------------------------------------> 
 
@@ -36,14 +37,23 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
                     )
                   ),
             
-            tabPanel("Microdata"
+            tabPanel("Microdata",
+                     fluidRow(
+                       column(8, selectInput("Microdata_Question", label = h5("Select Microdata Parameter"), 
+                                             choices = unique(colnames(project.microdata))),
+                       column(4, plotOutput("distribution"))
+                     ),
                      
+                     fluidRow(
+                       column(12,
+                              plotOutput("samplesPlot"))
+                     )
                   ),
             
             tabPanel("More Information", fluidPage(
                        titlePanel("test")
                       )
-                     )
+                     ))
             
   )
 )
@@ -58,17 +68,28 @@ server <- shinyServer(function(input, output, session) {
             
             observe({
               updateSelectInput(session, "metric",
-                                choices = outVar())
-            })
+                                choices = outVar()
+            )})
                
-            output$demoPlot <- renderPlot({
-              ggplot() + 
-                geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$Question)) + 
-                geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
+             output$demoPlot <- renderPlot({
+               ggplot() + 
+                 geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$Question)) + 
+                 geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
                            aes(x = date, y = results, color = as.character(input$demo))) + 
-                scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) + 
-                theme(legend.position = "bottom")
-            })
+                 scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) + theme(legend.position = "bottom")
+             })
+             
+             output$samplesPlot <- renderPlot({
+               ggplot(project.microdata %>%
+                        filter(!is.na(input$Microdata_Question)) %>%
+                        select(date) %>%
+                        group_by(date) %>%
+                        count(date)) + 
+                 geom_bar(aes(x = date, y = n), stat = "identity")
+               
+             })
+             
+             #output$distribution 
 })
 
 # Run the application 

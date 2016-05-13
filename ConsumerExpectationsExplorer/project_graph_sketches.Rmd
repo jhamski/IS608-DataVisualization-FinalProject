@@ -13,13 +13,10 @@ library(dplyr)
 ```{r}
 load("data_demo.Rda")
 load("data_all.Rda")
+load("project_micro_data.Rda")
 ```
 
-```{r}
-data.all$survey <- as.factor(data.all$survey)
-```
-
-
+All Repondents vs Demographic Comparisons
 ```{r}
 survey.input = "Median one-year ahead expected inflation rate"
 demo.input.question = "Median One Year Ahead Inflation Rate Expectation"
@@ -32,5 +29,21 @@ ggplot() +
   geom_line(data =  filter(data.demo, Question == demo.input.question & Demographic == demo.input.demo), aes(x = date, y = results, color = as.character(demo.input.demo))) + 
   scale_color_manual(values = c("blue", "red"))
 
+```
+
+```{r}
+test <- project.microdata %>%
+  filter(!is.na(Fin.better.worse.from.now.2)) %>%
+  select(date) %>%
+  group_by(date) %>%
+  count(date)
+```
+
+```{r}
+ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
+```
+
+```{r}
+ggplot(project.microdata) + geom_freqpoly(aes(weight), stat="count")
 ```
 

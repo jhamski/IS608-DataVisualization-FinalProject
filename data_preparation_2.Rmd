@@ -15,9 +15,6 @@ library(zoo)
 library(ggplot2)
 ```
 
-Goal: a 'long' data frame with three columns:
-(1) date (2) demographic (3) observation
-
 ```{r}
 format.year <- function(question.data){
   question.data$date <- question.data$date %>%
@@ -30,85 +27,40 @@ format.year <- function(question.data){
 ```
 
 
+Goal: a 'long' data frame with three columns:
+(1) date (2) demographic (3) observation
+
 # All Respondents
 
-## Inflation
+Note two tabs required being split into separate tabs: Credit availability and Household (HH) financial situation. 
 ```{r}
-demo.data.inflation <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation expectations', na = "NA", skip = 3)
-
-demo.data.inflation$Question <- "Inflation Expectations"
-
-demo.data.inflation$date <- demo.data.inflation$date %>%
-  as.character() %>%
-  as.yearmon("%Y%m") %>%
-  as.Date(frac = 1) 
+tabs <- c("Inflation expectations", "Inflation uncertainty", "Home price expectations", "Home price uncertainty", "Commodity expectations", "Earnings growth", "Earnings uncertainty", "Job separation expectation", "Job finding expectations", "Unemployment Expectations", "Moving expectations", "HH Income Change", "HH Spending Change", "Taxes Change", "Credit availability Year Ago", "Credit availability Year Ahead", "Delinquency expectations", "Interest rate expectations", "HH financial situation Year Ago", "HH financial situation Year Ahe", "Stock Prices", "Government debt")
 ```
 
 ```{r}
-data.all <- demo.data.inflation %>% gather("survey", "results", 2:9)
+
+build.dataset.all <- function(tab){
+  question.data <- read_excel('FRBNY-SCE-Data.xls', sheet = tab, na = "NA", skip = 3)
+  
+  question.data$Question <- tab
+  
+  question.data <- format.year(question.data)
+  
+  print(colnames(question.data))
+  
+  second.to.last <- ncol(question.data) - 1
+  
+  question.data <- gather(question.data, "survey", "results", 2:second.to.last)
+
+  return(question.data)
+  }
 ```
-## Inflation Uncertainty
+
 ```{r}
-demo.data.inflation.uncertainty <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation uncertainty', na = "NA", skip = 3)
+data.all <- lapply(tabs, FUN = build.dataset.all)
 
-demo.data.inflation.uncertainty$Question <- "Inflation Expectation Uncertainty"
-
-
-demo.data.inflation.uncertainty$date <- demo.data.inflation.uncertainty$date %>%
-  as.character() %>%
-  as.yearmon("%Y%m") %>%
-  as.Date(frac = 1) 
+data.all <- rbind_all(data.all)
 ```
-
-```{r}
-data.all <- rbind(data.all, demo.data.inflation.uncertainty %>% gather("survey", "results", 2:3))
-```
-
-## Home Prices
-```{r}
-demo.data.home.prices <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Home price expectations', na = "NA", skip = 3)
-
-demo.data.home.prices$Question <- "Home Price Change Expectation"
-
-demo.data.home.prices <- format.year(demo.data.home.prices)
-
-data.all <- rbind(data.all, demo.data.home.prices %>% gather("survey", "results", 2:6))
-```
-
-## Home Price Uncertainty
-```{r}
-demo.data.home.prices.uncertainty <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Home price uncertainty', na = "NA", skip = 3)
-
-demo.data.home.prices.uncertainty$Question <- "Home Price Change Uncertainty"
-
-demo.data.home.prices.uncertainty <- format.year(demo.data.home.prices.uncertainty)
-
-data.all <- rbind(data.all, demo.data.home.prices.uncertainty %>% gather("survey", "results", 2:2))
-```
-
-## Commodity expectations
-```{r}
-demo.data.commodities <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Commodity expectations', na = "NA", skip = 3)
-
-demo.data.commodities$Question <- "Commodity Price Change Expecations"
-
-demo.data.commodities <- format.year(demo.data.commodities)
-
-data.all <- rbind(data.all, demo.data.commodities %>% gather("survey", "results", 2:7))
-```
-
-## Earnings growth
-```{r}
-demo.data.earnings <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Earnings growth', na = "NA", skip = 3)
-
-demo.data.earnings$Question <- "Earnings Growth Expecations"
-
-demo.data.earnings <- format.year(demo.data.earnings)
-
-data.all <- rbind(data.all, demo.data.earnings %>% gather("survey", "results", 2:5))
-```
-
-
 
 
 

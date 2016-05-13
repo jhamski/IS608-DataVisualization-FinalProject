@@ -150,9 +150,12 @@ project$year <- format(project$date, format = "%y")
 project$month <- format(project$date, format = "%m")
 ```
 
-
 ```{r}
 project.microdata <- project
+```
+
+
+```{r}
 save(project.microdata, file = "ConsumerExpectationsExplorer/project_micro_data.Rda")
 ```
 
