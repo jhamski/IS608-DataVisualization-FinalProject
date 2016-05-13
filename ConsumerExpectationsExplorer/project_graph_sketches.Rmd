@@ -13,13 +13,37 @@ library(dplyr)
 ```{r}
 load("data_demo.Rda")
 load("data_all.Rda")
+load("survey_microdata.Rda")
+```
+
+
+
+
+```{r}
+test <- microdata %>%
+  filter(!is.na(`Financially better or worse off than 12 months ago`)) %>%
+  select(`Month Survey was administered`) %>%
+  group_by(`Month Survey was administered`) %>%
+  count(`Month Survey was administered`)
 ```
 
 ```{r}
-data.all$survey <- as.factor(data.all$survey)
+ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
+```
+
+```{r}
+ggplot(microdata) + geom_histogram(aes(`Financially better or worse off than 12 months ago`), stat="count")
 ```
 
 
+
+
+`Financially better or worse off than 12 months ago`
+
+
+
+
+All Repondents vs Demographic Comparisons
 ```{r}
 survey.input = "Median one-year ahead expected inflation rate"
 demo.input.question = "Median One Year Ahead Inflation Rate Expectation"
@@ -33,4 +57,3 @@ ggplot() +
   scale_color_manual(values = c("blue", "red"))
 
 ```
-

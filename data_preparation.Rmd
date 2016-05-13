@@ -18,26 +18,33 @@ library(zoo)
 
 #### Load Microdata Excel File
 ```{r}
-microdata <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Data', na = "NA", skip = 1)
+microdata.original <- read_excel('FRBNY-SCE-Public-Microdata-Complete.xlsx', sheet = 'Data', na = "NA", skip = 1)
 ```
+
+```{r}
+microdata.original <- microdata.original[,-189] 
+
+microdata <- select(microdata.original, -QNUM1, -QNUM2, -QNUM3, -QNUM5, -QNUM6, -Q9_bin1, -Q9_bin2, -Q9_bin3, -Q9_bin4, -Q9_bin5, -Q9_bin6, -Q9_bin7, -Q9_bin8, -Q9_bin9, -Q9_bin10, -Q9c_bin1, -Q9c_bin2, -Q9c_bin3, -Q9c_bin4, -Q9c_bin5, -Q9c_bin6, -Q9c_bin7, -Q9c_bin8, -Q9c_bin9, -Q9c_bin10)
+
+```
+
 
 #### Cleaning the microdata dataframe
 ```{r}
-colnames(microdata)[189] <- "_HH_INC_CAT2"
+fields <- read_excel("microdata fields.xlsx", sheet = "ColumnKey")
+fields <- fields[,1:2]
 
-microdata <- microdata[!is.na(microdata$date),]
-microdata$date <- as.character(microdata$date)
+removal.list <- c("QNUM1", "QNUM2", "QNUM3", "QNUM5", "QNUM6", "Q9_bin1", "Q9_bin2", "Q9_bin3", "Q9_bin4", "Q9_bin5", "Q9_bin6", "Q9_bin7", "Q9_bin8", "Q9_bin9", "Q9_bin10", "Q9c_bin1", "Q9c_bin2", "Q9c_bin3", "Q9c_bin4", "Q9c_bin5", "Q9c_bin6", "Q9c_bin7", "Q9c_bin8", "Q9c_bin9", "Q9c_bin10")
 
-microdata$date <- as.Date(as.yearmon(microdata$date, "%Y%m"), frac = 1) 
-```
+fields <- fields %>%
+  filter(!ID %in% removal.list)
 
-#### Create new dataframe from what will be used in project
-```{r}
-project <- data.frame(NULL)
+colnames(microdata) <- fields$Description
 ```
 
 ```{r}
-project <- microdata[1:4]
+microdata.original$date <- as.character(microdata.original$date)
+microdata$`Month Survey was administered` <- as.Date(as.yearmon(microdata.original$date, "%Y%m"), frac = 1)
 ```
 
 #### Column-spectific changes 
@@ -49,12 +56,9 @@ better.worse <- c("much worse off",
                  "somewhat better off",
                  "much better off")
 
-project$Fin.better.worse.ago.1 <- factor(microdata$Q1, levels = 1:5, labels = better.worse)
-project$Fin.better.worse.from.now.2 <- factor(microdata$Q2, levels = 1:5, labels = better.worse)
+microdata$`Financially better or worse off than 12 months ago` <- factor(microdata$`Financially better or worse off than 12 months ago`, levels = 1:5, labels = better.worse)
+microdata$`Financially better or worse off 12 months from now` <- factor(microdata$`Financially better or worse off 12 months from now`, levels = 1:5, labels = better.worse)
 ```
-
-
-
 
 ```{r}
 harder.easier <- c("much harder",
@@ -63,8 +67,8 @@ harder.easier <- c("much harder",
                  "somewhat easier",
                  "much easier")
 
-project$obtain.credit.ago.28 <- factor(microdata$Q28, levels = 1:5, labels = harder.easier)
-project$obtain.credit.from.now.29 <- factor(microdata$Q29, levels = 1:5, labels = harder.easier)
+microdata$`Harder or easier to obtain credit compared to 12 months ago` <- factor(microdata$`Harder or easier to obtain credit compared to 12 months ago`, levels = 1:5, labels = harder.easier)
+microdata$`Harder or easier to obtain credit compared to 12 months from now` <- factor(microdata$`Harder or easier to obtain credit compared to 12 months from now`, levels = 1:5, labels = harder.easier)
 ```
 
 #### Demographic Sections
@@ -72,15 +76,15 @@ project$obtain.credit.from.now.29 <- factor(microdata$Q29, levels = 1:5, labels 
 gender <- c("female", "male")
 no.yes <- c("no", "yes")
 
-project$gender <- factor(microdata$Q33, levels = 1:2, labels = gender)
+microdata$Gender <- factor(microdata$Gender, levels = 1:2, labels = gender)
 
-project$id.Hispanic <- factor(microdata$Q34, levels = 1:2, labels = no.yes)
-project$id.White <- factor(microdata$Q35_1, levels = 0:1, labels = no.yes)
-project$id.Black <- factor(microdata$Q35_2, levels = 0:1, labels = no.yes)
-project$id.AmerIndian <- factor(microdata$Q35_3, levels = 0:1, labels = no.yes)
-project$id.Asian <- factor(microdata$Q35_4, levels = 0:1, labels = no.yes)
-project$id.NatHawaiian <- factor(microdata$Q35_5, levels = 0:1, labels = no.yes)
-project$id.OtherRace <- factor(microdata$Q35_6, levels = 0:1, labels = no.yes)
+microdata$`Hispanic, Latino, or Spanish Origin` <- factor(microdata$`Hispanic, Latino, or Spanish Origin`, levels = 1:2, labels = no.yes)
+microdata$`Identify as white` <- factor(microdata$`Identify as white`, levels = 0:1, labels = no.yes)
+microdata$`Identify as black/African American` <- factor(microdata$`Identify as black/African American`, levels = 0:1, labels = no.yes)
+microdata$`Identify as American Indian / Alaska Native` <- factor(microdata$`Identify as American Indian / Alaska Native`, levels = 0:1, labels = no.yes)
+microdata$`Identify as Asian` <- factor(microdata$`Identify as Asian`, levels = 0:1, labels = no.yes)
+microdata$`Identify as Native Hawaiian or other Pacific Islander` <- factor(microdata$`Identify as Native Hawaiian or other Pacific Islander`, levels = 0:1, labels = no.yes)
+microdata$`Identify as other race` <- factor(microdata$`Identify as other race`, levels = 0:1, labels = no.yes)
 ```
 
 ```{r}
@@ -94,7 +98,7 @@ education.levels <- c("Less than high school",
                       "Professional Degree",
                       "Other education")
 
-project$education.levels.36 <- factor(microdata$Q36, levels = 1:9, labels = education.levels)
+microdata$`Highest level of education completed` <- factor(microdata$`Highest level of education completed`, levels = 1:9, labels = education.levels)
 ```
 
 ```{r}
@@ -106,23 +110,18 @@ length <- c("Less than 1 month",
 
 yes.no <- c("yes", "no")
 
-project$current.job.length.37 <- factor(microdata$Q37, levels = 1:5, labels = length)
+microdata$`Length of employment at current job` <- factor(microdata$`Length of employment at current job`, levels = 1:5, labels = length)
 
-project$married.or.partner.38 <- factor(microdata$Q38, levels = 0:1, labels = yes.no)
+microdata$`Are you currently married or living as a partner with someone` <- factor(microdata$`Are you currently married or living as a partner with someone`, levels = 0:1, labels = yes.no)
 ```
 
-```{r}
-project$state <- microdata$`_STATE`
-project$years.at.residence.41 <- microdata$Q41
-project$years.in.state.42 <- microdata$Q42
-```
 
 ```{r}
 own.rent <- c("own", "rent", "other")
 
-project$own.rent.43 <- factor(microdata$Q43, levels = 1:3, labels = own.rent)
-project$own.other.homes.44 <- factor(microdata$Q44, levels = 1:2, labels = yes.no)
-project$live.alone.45 <- factor(microdata$Q45new_9, levels = 0:1, labels = no.yes)
+microdata$`Own or Rent primary Residence` <- factor(microdata$`Own or Rent primary Residence`, levels = 1:3, labels = own.rent)
+microdata$`Own other homes` <- factor(microdata$`Own other homes`, levels = 1:2, labels = yes.no)
+microdata$`Live alone` <- factor(microdata$`Live alone`, levels = 0:1, labels = no.yes)
 ```
 
 ```{r}
@@ -138,21 +137,15 @@ incomes <- c( "Less than $10,000",
               "$150,000 to $199,999",
               "$200,000 or more")
 
-project$total.income.47 <- factor(microdata$Q47, levels = 1:length(incomes), labels = incomes)
-```
-
-```{r}
-project$numeracy <- as.factor(microdata$`_NUM_CAT`)
-```
-
-```{r}
-project$year <- format(project$date, format = "%y")
-project$month <- format(project$date, format = "%m")
+microdata$`Total combined pretax income in household` <- factor(microdata$`Total combined pretax income in household`, levels = 1:length(incomes), labels = incomes)
 ```
 
 
 ```{r}
-project.microdata <- project
-save(project.microdata, file = "ConsumerExpectationsExplorer/project_micro_data.Rda")
+save(microdata, file = "ConsumerExpectationsExplorer/survey_microdata.Rda")
+```
+
+```{r}
+
 ```
 
