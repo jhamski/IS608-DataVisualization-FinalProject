@@ -13,8 +13,35 @@ library(dplyr)
 ```{r}
 load("data_demo.Rda")
 load("data_all.Rda")
-load("project_micro_data.Rda")
+load("survey_microdata.Rda")
 ```
+
+
+
+
+```{r}
+test <- microdata %>%
+  filter(!is.na(`Financially better or worse off than 12 months ago`)) %>%
+  select(`Month Survey was administered`) %>%
+  group_by(`Month Survey was administered`) %>%
+  count(`Month Survey was administered`)
+```
+
+```{r}
+ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
+```
+
+```{r}
+ggplot(microdata) + geom_freqpoly(aes(`Change in taxes`), stat="count")
+```
+
+
+
+
+
+
+
+
 
 All Repondents vs Demographic Comparisons
 ```{r}
@@ -30,20 +57,3 @@ ggplot() +
   scale_color_manual(values = c("blue", "red"))
 
 ```
-
-```{r}
-test <- project.microdata %>%
-  filter(!is.na(Fin.better.worse.from.now.2)) %>%
-  select(date) %>%
-  group_by(date) %>%
-  count(date)
-```
-
-```{r}
-ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
-```
-
-```{r}
-ggplot(project.microdata) + geom_freqpoly(aes(weight), stat="count")
-```
-
