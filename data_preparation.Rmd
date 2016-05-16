@@ -140,6 +140,13 @@ incomes <- c( "Less than $10,000",
 microdata$`Total combined pretax income in household` <- factor(microdata$`Total combined pretax income in household`, levels = 1:length(incomes), labels = incomes)
 ```
 
+```{r}
+microdata <- microdata %>%
+  filter(!is.na(`Month Survey was administered`)) %>%
+  select(-`Respondent ID`)
+
+```
+
 
 ```{r}
 save(microdata, file = "ConsumerExpectationsExplorer/survey_microdata.Rda")

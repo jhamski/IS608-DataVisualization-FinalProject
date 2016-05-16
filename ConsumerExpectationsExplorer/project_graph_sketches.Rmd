@@ -17,28 +17,31 @@ load("survey_microdata.Rda")
 ```
 
 
-
-
-```{r}
-test <- microdata %>%
-  filter(!is.na(`Financially better or worse off than 12 months ago`)) %>%
-  select(`Month Survey was administered`) %>%
-  group_by(`Month Survey was administered`) %>%
-  count(`Month Survey was administered`)
-```
+Factor
 
 ```{r}
-ggplot(test)+geom_bar(aes(x=date, y=n), stat="identity")
-```
+column.1 <- "`Financially better or worse off 12 months from now`"
 
-```{r}
-ggplot(microdata) + geom_histogram(aes(`Financially better or worse off than 12 months ago`), stat="count")
+ggplot(microdata) + geom_bar(aes_string(x = column.1), stat = "count") 
 ```
 
 
+Number
 
+```{r}
+column.2 <- "`Rate of inflation / deflation over next 12 months`"
 
-`Financially better or worse off than 12 months ago`
+ggplot(microdata, aes_string(x = column.2)) + geom_density() + xlim(-100, 100)
+```
+
+```{r}
+q = quantile(as.matrix(select_(microdata, column.2)), na.rm = TRUE, probs =  c(0.1, 0.9))
+```
+
+```{r}
+ ifelse(typeof(select_(microdata, column.1)[[1]]) == "double", "yes", "no")
+```
+
 
 
 

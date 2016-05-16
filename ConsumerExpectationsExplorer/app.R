@@ -39,17 +39,15 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
             
             tabPanel("Microdata",
                      fluidRow(
-                       column(8, selectInput("Microdata_Question", label = h5("Select Microdata Parameter"), 
-                                             choices = unique(colnames(microdata))),
-                       column(4, plotOutput("distribution"))
+                       column(4, selectInput("Microdata_Question", label = h5("Select Microdata Parameter"), 
+                                             choices = unique(colnames(microdata)), selected = "Rate of inflation / deflation over next 12 months")),
+                       column(8, plotOutput("distribution"), verbatimTextOutput("microSummary"))
                      ),
                      
                      fluidRow(
-                       column(12,
-                              plotOutput("samplesPlot"))
+                       column(12, plotOutput("samplesPlot"))
                      )
-                  )
-                ),
+                  ),
             
             tabPanel("Analysis", fluidPage(
               titlePanel("test")
@@ -95,8 +93,17 @@ server <- shinyServer(function(input, output, session) {
              })
              
              output$distribution <- renderPlot({
-               ggplot(microdata) + geom_freqpoly(aes(input$Microdata_Question), stat="count")
+              #Idea - let the user select the quantiles to display, but default to 10 / 90
+               q = quantile(as.matrix(select_(microdata, column.2)), na.rm = TRUE, probs =  c(0.1, 0.9))
+               
+               ifelse(
+                 typeof(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))[[1]]) == "double", 
+                      return(ggplot(microdata, aes_string(x = paste("`",input$Microdata_Question, "`", sep=""))) + geom_density(na.rm = TRUE) + xlim(q[1], q[2])), 
+                      return(ggplot(microdata) + geom_bar(aes_string(x = paste("`",input$Microdata_Question, "`", sep="")), stat = "count")) 
+               )
              })
+             
+             output$microSummary <- renderPrint(summary(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))))
 })
 
 # Run the application 
