@@ -50,7 +50,11 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey",
                   ),
             
             tabPanel("Analysis", fluidPage(
-              titlePanel("test")
+              headerPanel("Statistical Analysis"),
+              tabsetPanel(
+                tabPanel("Seasonality"),
+                tabPanel("Correlations")
+              )
             )),
             
             tabPanel("More Information", fluidPage(
@@ -94,7 +98,9 @@ server <- shinyServer(function(input, output, session) {
              
              output$distribution <- renderPlot({
               #Idea - let the user select the quantiles to display, but default to 10 / 90
-               q = quantile(as.matrix(select_(microdata, column.2)), na.rm = TRUE, probs =  c(0.1, 0.9))
+               if(typeof(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))[[1]]) == "double"){
+                 q = quantile(as.matrix(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))), na.rm = TRUE, probs =  c(0.1, 0.9))
+               } 
                
                ifelse(
                  typeof(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))[[1]]) == "double", 
