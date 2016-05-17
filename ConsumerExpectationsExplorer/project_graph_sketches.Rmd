@@ -17,12 +17,31 @@ load("survey_microdata.Rda")
 ```
 
 
+```{r}
+library(caret)
+```
+
+```{r}
+featurePlot(x = microdata[,c(78,85, 88)],
+            y = microdata[,162], 
+            plot = "pairs",)
+```
+
+
+
+
+```{r}
+source('project_theme.R')
+```
+
+
+
 Factor
 
 ```{r}
 column.1 <- "`Financially better or worse off 12 months from now`"
 
-ggplot(microdata) + geom_bar(aes_string(x = column.1), stat = "count") 
+ggplot(microdata) + geom_bar(aes_string(x = column.1), stat = "count") + project.theme()
 ```
 
 
