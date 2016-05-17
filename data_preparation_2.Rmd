@@ -89,10 +89,127 @@ data.demo <- data.demo.inflation.1yr %>% gather("Demographic", "results", 2:16)
 data.demo <- rbind(data.demo, data.demo.inflation.3yr %>% gather("Demographic", "results", 2:16))
 ```
 
+```{r}
+data.demo.inf.uncer <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Inflation uncertainty Demo', na = "NA", skip = 3)
+# this tab has essentially two tables side by side
+data.demo.inf.uncer.1yr <- data.demo.inf.uncer[1:16]
+data.demo.inf.uncer.1yr$Question <- "Median One Year Ahead Inflation Rate Uncertainty"
+data.demo.inf.uncer.3yr <- data.demo.inf.uncer[17:32]
+data.demo.inf.uncer.3yr$Question <- "Median Three Year Ahead Inflation Rate Uncertainty"
+
+data.demo.inf.uncer.1yr$date <- data.demo.inf.uncer.1yr$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+data.demo.inf.uncer.3yr$date <- data.demo.inf.uncer.3yr$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.inf.uncer.1yr %>% gather("Demographic", "results", 2:16))
+data.demo <- rbind(data.demo, data.demo.inf.uncer.3yr %>% gather("Demographic", "results", 2:16))
+```
 
 
 ```{r}
-save(data.all, file = "ConsumerExpectationsExplorer/data_all.Rda")
+data.demo.home <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Home price expectations Demo', na = "NA", skip = 3)
+# this tab has just has one
+data.demo.home <- data.demo.home[1:16]
+data.demo.home$Question <- "Home price expectations Demo"
+
+data.demo.home$date <- data.demo.home$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.home %>% gather("Demographic", "results", 2:16))
+```
+
+
+```{r}
+data.demo.home.unc <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Home price uncertainty Demo', na = "NA", skip = 3)
+data.demo.home.unc <- data.demo.home.unc[1:16]
+data.demo.home.unc$Question <- "Home price uncertainty Demo"
+
+data.demo.home.unc$date <- data.demo.home.unc$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.home.unc %>% gather("Demographic", "results", 2:16))
+```
+
+```{r}
+data.demo.earn <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Earnings growth Demo', na = "NA", skip = 3)
+data.demo.earn <- data.demo.earn[1:16]
+data.demo.earn$Question <- "Earnings growth Demo"
+
+data.demo.earn$date <- data.demo.earn$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.earn %>% gather("Demographic", "results", 2:16))
+```
+
+```{r}
+data.demo.earn.unc <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Earnings uncertainty Demo', na = "NA", skip = 3)
+data.demo.earn.unc <- data.demo.earn.unc[1:16]
+data.demo.earn.unc$Question <- "Earnings uncertainty Demo"
+
+data.demo.earn.unc$date <- data.demo.earn.unc$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.earn.unc %>% gather("Demographic", "results", 2:16))
+```
+
+```{r}
+data.demo.jobsep <- read_excel('FRBNY-SCE-Data.xls', sheet = 'Job separation expectation Demo', na = "NA", skip = 3)
+# this tab has essentially two tables side by side
+data.demo.jobsep.1 <- data.demo.jobsep[1:16]
+data.demo.jobsep.1$Question <- "Mean probability of losing or leaving job over the next 12 months"
+data.demo.jobsep.2 <- data.demo.jobsep[17:32]
+data.demo.jobsep.2$Question <- "Mean probability of leaving a job voluntarily"
+
+data.demo.jobsep.1$date <- data.demo.jobsep.1$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+data.demo.jobsep.2$date <- data.demo.jobsep.2$date %>%
+  as.character() %>%
+  as.yearmon("%Y%m") %>%
+  as.Date(frac = 1)
+
+```
+
+```{r}
+data.demo <- rbind(data.demo, data.demo.jobsep.1 %>% gather("Demographic", "results", 2:16))
+data.demo <- rbind(data.demo, data.demo.jobsep.2 %>% gather("Demographic", "results", 2:16))
+```
+
+
+
+```{r}
+#save(data.all, file = "ConsumerExpectationsExplorer/data_all.Rda")
 save(data.demo, file = "ConsumerExpectationsExplorer/data_demo.Rda")
 
 ```

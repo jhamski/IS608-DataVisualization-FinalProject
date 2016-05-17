@@ -12,11 +12,11 @@ source('project_theme.R')
 
 # ----- UI ---------------------------------------------------> 
 
-ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey Explorer",
-            tabPanel("Timeseries View", fluidPage(theme = shinytheme("Flatly"),
-   
-                     # Page title
-                     titlePanel("NYFRB Consumer Expectations Survey"),
+ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
+            tabPanel("Project Information", fluidPage(
+               includeMarkdown("information.md"))), 
+            tabPanel("Timeseries", fluidPage(theme = shinytheme("Flatly"),
+                     titlePanel("FRBNY Consumer Expectations Survey - Calculated Timeseries"),
                      
                      sidebarLayout(
                         sidebarPanel(
@@ -40,6 +40,7 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey Explorer",
                   ),
             
             tabPanel("Microdata",
+                     titlePanel("Disribution of Survey Responses from the SCE Microdata"),
                      fluidRow(
                        column(4, selectInput("Microdata_Question", label = h5("Select Microdata Parameter"), 
                                              choices = unique(colnames(microdata)), selected = "Rate of inflation / deflation over next 12 months"), 
@@ -55,17 +56,20 @@ ui <- shinyUI(navbarPage("NYFRB Consumer Expectations Survey Explorer",
             tabPanel("Analysis", fluidPage(
               headerPanel("Statistical Analysis"),
               tabsetPanel(
-                tabPanel("Seasonality"),
-                tabPanel("Correlations")
+                tabPanel("Seasonality",
+                         sidebarPanel(
+                           selectInput("Question2", label = h5("Survey Question - All Respondents"), 
+                                       choices = unique(data.all$Question)),
+                           
+                           selectInput('metric2', 'Metric', "")
+                         ),
+                         mainPanel(
+                           plotOutput("seasonal")
+                         )
+                         ),
+                tabPanel("PCA")
               )
-            )),
-            
-            tabPanel("More Information", fluidPage(
-                       titlePanel("About the NYFRB Consumer Expectations Survey Explorer"),
-                       includeMarkdown("information.md")
             ))
-                     
-            
   )
 )
 
@@ -97,17 +101,7 @@ server <- shinyServer(function(input, output, session) {
                            aes(x = date, y = results, color = color.2)) + 
                  scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) +
                  scale_y_continuous(expand=c(0,0)) +
-                 project.theme() + theme(legend.position = "bottom")
-             })
-             
-             output$samplesPlot <- renderPlot({
-               ggplot(microdata %>%
-                        filter(!is.na(input$Microdata_Question)) %>%
-                        select(`Month Survey was administered`) %>%
-                        group_by(`Month Survey was administered`) %>%
-                        count(`Month Survey was administered`)) + 
-                 geom_bar(aes(x = `Month Survey was administered`, y = n), stat = "identity") + project.theme()
-               
+                 project.theme() + theme(legend.position = "bottom") + xlab("Month") + ylab("")
              })
              
              output$distribution <- renderPlot({
@@ -127,6 +121,29 @@ server <- shinyServer(function(input, output, session) {
              })
              
              output$microSummary <- renderPrint(summary(select_(microdata, paste("`",input$Microdata_Question, "`", sep=""))))
+              
+             outVar2 = reactive({
+               mydata2 = unique(filter(data.all, Question == input$Question2))
+               return(mydata2$survey)
+             })
+             
+             observe({
+               updateSelectInput(session, "metric2",
+                                 choices = outVar2()
+               )})
+             
+             
+             output$seasonal <- renderPlot({
+               seasonal.decom.data <- data.all %>%
+                 filter(Question == input$Question2) %>%
+                 filter(survey == input$metric2) %>%
+                 select(results) 
+               
+               seasonal.decom.data <- ts(seasonal.decom.data$results, deltat = 1/12)
+               
+               plot(stl(seasonal.decom.data, s.window="periodic"))
+               
+             })             
 })
 
 # Run the application 

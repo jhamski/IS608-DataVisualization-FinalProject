@@ -16,6 +16,21 @@ load("data_all.Rda")
 load("survey_microdata.Rda")
 ```
 
+```{r}
+seasonal.decom.data <- data.all %>%
+  filter(Question == "Inflation expectations") %>%
+  filter(survey == "Median one-year ahead expected inflation rate") %>%
+  select(results) 
+
+seasonal.decom.data <- ts(seasonal.decom.data$results, deltat = 1/12)
+```
+
+```{r}
+stl.series <- stl(seasonal.decom.data, s.window="periodic")
+```
+
+
+
 
 ```{r}
 library(caret)
@@ -26,8 +41,6 @@ featurePlot(x = microdata[,c(78,85, 88)],
             y = microdata[,162], 
             plot = "pairs",)
 ```
-
-
 
 
 ```{r}
@@ -60,9 +73,6 @@ q = quantile(as.matrix(select_(microdata, column.2)), na.rm = TRUE, probs =  c(0
 ```{r}
  ifelse(typeof(select_(microdata, column.1)[[1]]) == "double", "yes", "no")
 ```
-
-
-
 
 
 All Repondents vs Demographic Comparisons
