@@ -13,3 +13,6 @@ This Shiny App uses two data sources from the SCE:
 - Survey response timeseries, based on the Microdata and cleaned, calculated, and weighted according to NYFRB methods. (Timeseries tab)
 
 The Analysis tab features selected analysis methods for viewing the dataset, including Seasonal Decomposition of Time Series by Loess and Principle Component Analysis (PCA).
+
+
+*Source: Survey of Consumer Expectations, © 2013-2015 Federal Reserve Bank of New York (FRBNY). The SCE data are available without charge at /microeconomics/sceIndex and may be used subject to license terms posted below. FRBNY disclaims any responsibility or legal liability for this analysis and interpretation of Survey of Consumer Expectations data.*
