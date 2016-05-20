@@ -1,12 +1,14 @@
 
-library(shiny)
-library(shinythemes) #https://rstudio.github.io/shinythemes/
-library(ggplot2)
-library(dplyr)
+require(shiny)
+require(shinythemes) #https://rstudio.github.io/shinythemes/
+require(ggplot2)
+require(dplyr)
+require(markdown)
 
 load("data_demo.Rda")
 load("data_all.Rda")
 load("survey_microdata.Rda")
+
 
 source('project_theme.R')
 
@@ -15,7 +17,7 @@ source('project_theme.R')
 ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
             tabPanel("Project Information", fluidPage(
                includeMarkdown("information.md"))), 
-            tabPanel("Timeseries", fluidPage(theme = shinytheme("Flatly"),
+            tabPanel("Timeseries", fluidPage(theme = shinytheme("flatly"),
                      titlePanel("FRBNY Consumer Expectations Survey - Calculated Timeseries"),
                      
                      sidebarLayout(
@@ -46,12 +48,8 @@ ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
                                              choices = unique(colnames(microdata)), selected = "Rate of inflation / deflation over next 12 months"), 
                                  sliderInput("boundingPercentile", label = "Percentiles to display", min = 0, max =100, value = c(10, 90))),
                        column(8, plotOutput("distribution"), verbatimTextOutput("microSummary"))
-                     ),
-                     
-                     fluidRow(
-                       column(12, plotOutput("samplesPlot"))
                      )
-                  ),
+            ),
             
             tabPanel("Analysis", fluidPage(
               headerPanel("Statistical Analysis"),
@@ -87,9 +85,7 @@ server <- shinyServer(function(input, output, session) {
             )})
                
              output$demoPlot <- renderPlot({
-               
-               if (is.null(input$demo))
-                 return()
+              
                
                color.1 = input$Question
                color.2 = input$demo
@@ -99,7 +95,7 @@ server <- shinyServer(function(input, output, session) {
                  geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = color.1)) + 
                  geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
                            aes(x = date, y = results, color = color.2)) + 
-                 scale_color_manual(values = c("blue", "red"), guide = guide_legend(title = "")) +
+                 scale_color_discrete(guide = guide_legend(title = "")) +
                  scale_y_continuous(expand=c(0,0)) +
                  project.theme() + theme(legend.position = "bottom") + xlab("Month") + ylab("")
              })
