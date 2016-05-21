@@ -92,7 +92,7 @@ server <- shinyServer(function(input, output, session) {
 
                ggplot() + 
                  #the temporary aesthetics error is because of the color assignment in the next line
-                 geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = color.1)) + 
+                 geom_line(data =  filter(data.all, Question == input$Question & survey == input$metric), aes(x = date, y = results, color = input$metric)) + 
                  geom_line(data =  filter(data.demo, Question == input$question & Demographic == input$demo), 
                            aes(x = date, y = results, color = color.2)) + 
                  scale_color_discrete(guide = guide_legend(title = "")) +

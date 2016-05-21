@@ -8,13 +8,30 @@ output: html_document
 ```{r}
 library(ggplot2)
 library(dplyr)
+library(tidyr)
 ```
 
 ```{r}
-load("data_demo.Rda")
-load("data_all.Rda")
-load("survey_microdata.Rda")
+load("ConsumerExpectationsExplorer/data_demo.Rda")
+load("ConsumerExpectationsExplorer/data_all.Rda")
+load("ConsumerExpectationsExplorer/survey_microdata.Rda")
 ```
+
+
+```{r}
+PCA.dataset <- data.demo %>%
+  unite(col = Survey, Question, Demographic) %>%
+  spread(key = Survey, value = results) %>% 
+  select(-date) %>%
+  as.matrix() %>%
+  prcomp()
+```
+
+
+
+
+
+
 
 ```{r}
 seasonal.decom.data <- data.all %>%
