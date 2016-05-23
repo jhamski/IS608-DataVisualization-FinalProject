@@ -166,20 +166,24 @@ server <- shinyServer(function(input, output, session) {
                
              }) 
              
-             output$PCA <- renderPlot({
-               PCA.dataset <- data.demo %>%
-                 unite(col = Survey, Question, Demographic) %>%
-                 spread(key = Survey, value = results) %>% 
-                 select(-date) %>%
-                 select(matches(input$question.PCA)) %>% 
-                 as.matrix() %>%
-                 prcomp(tol = sqrt(.Machine$double.eps), scale = T)
+             PCA.dataset <- reactive({PCA.dataset <- data.demo %>%
+               unite(col = Survey, Question, Demographic) %>%
+               spread(key = Survey, value = results) %>% 
+               select(-date) %>%
+               select(matches(input$question.PCA)) %>% 
+               as.matrix() %>%
+               prcomp(tol = sqrt(.Machine$double.eps), scale = T)
                
+               return(PCA.dataset)})
+             
+             output$PCA <- renderPlot({
+               PCA.dataset <- PCA.dataset()
                ggbiplot(PCA.dataset, obs.scale = 1, var.scale = 1, circle = TRUE)
                
              })
              
              output$Rotations <- DT::renderDataTable({
+               PCA.dataset <- PCA.dataset()
                PCA.dataset$rotation[,1:4]
              })
 })
