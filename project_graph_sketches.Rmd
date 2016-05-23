@@ -17,18 +17,57 @@ load("ConsumerExpectationsExplorer/data_all.Rda")
 load("ConsumerExpectationsExplorer/survey_microdata.Rda")
 ```
 
+```{r}
+library(ggbiplot)
+```
+
 
 ```{r}
+question.PCA <- unique(data.demo$Question)[1]
+
 PCA.dataset <- data.demo %>%
   unite(col = Survey, Question, Demographic) %>%
+  spread(key = Survey, value = results) %>% 
+  select(-date) %>%
+  select(matches(question.PCA)) %>% 
+  as.matrix() %>%
+  prcomp(tol = sqrt(.Machine$double.eps), scale = T)
+```
+
+```{r}
+ggbiplot(PCA.dataset, obs.scale = 1, var.scale = 1, circle = TRUE) 
+```
+
+
+
+
+```{r}
+PCA.dataset2 <- data.all %>%
+  unite(col = Survey, Question, survey) %>%
   spread(key = Survey, value = results) %>% 
   select(-date) %>%
   as.matrix() %>%
   prcomp()
 ```
 
+```{r}
+ggbiplot(PCA.dataset2, obs.scale = 1, var.scale = 1, circle = TRUE)
+
+```
 
 
+```{r}
+require(caret)
+trans = preProcess(PCA.dataset, 
+                   method=c("BoxCox", "center", 
+                            "scale", "pca"))
+PC = predict(trans, PCA.dataset)
+```
+
+```{r}
+ggbiplot(PC, obs.scale = 1, var.scale = 1, circle = TRUE)
+
+```
 
 
 

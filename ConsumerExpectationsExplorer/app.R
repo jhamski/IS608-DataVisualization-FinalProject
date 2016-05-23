@@ -1,9 +1,23 @@
+# Final Project: IS608 - Data Visualization
 
 require(shiny)
 require(shinythemes) #https://rstudio.github.io/shinythemes/
 require(ggplot2)
 require(dplyr)
 require(markdown)
+require(devtools)
+require(tidyr)
+require(DT)
+
+is.installed <- function(mypkg){
+  is.element(mypkg, installed.packages()[,1])
+} 
+
+if (!is.installed("ggbiplot")){
+  install_github("vqv/ggbiplot")
+}
+
+require(ggbiplot)
 
 load("data_demo.Rda")
 load("data_all.Rda")
@@ -25,7 +39,7 @@ ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
                           selectInput("Question", label = h5("Survey Question - All Respondents"), 
                                       choices = unique(data.all$Question)),
                           
-                          selectInput('metric', 'Metric', ""),
+                          selectInput('metric', label = h5('Metric'), ""),
                           
                           selectInput("question", label = h5("Survey Question for Demographic Slice"), 
                                       choices = unique(data.demo$Question)),
@@ -65,7 +79,18 @@ ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
                            plotOutput("seasonal")
                          )
                          ),
-                tabPanel("PCA")
+                tabPanel("PCA",
+                         fluidRow(column(12,
+                           selectInput("question.PCA", label = h5("Select Timeseries"), 
+                                       choices = unique(data.demo$Question))
+                           )),
+                         fluidRow(column(12,
+                           plotOutput("PCA")
+                          )), 
+                         fluidRow(column(12,
+                                         DT::dataTableOutput('Rotations')
+                         ))
+                         )
               )
             ))
   )
@@ -139,7 +164,24 @@ server <- shinyServer(function(input, output, session) {
                
                plot(stl(seasonal.decom.data, s.window="periodic"))
                
-             })             
+             }) 
+             
+             output$PCA <- renderPlot({
+               PCA.dataset <- data.demo %>%
+                 unite(col = Survey, Question, Demographic) %>%
+                 spread(key = Survey, value = results) %>% 
+                 select(-date) %>%
+                 select(matches(input$question.PCA)) %>% 
+                 as.matrix() %>%
+                 prcomp(tol = sqrt(.Machine$double.eps), scale = T)
+               
+               ggbiplot(PCA.dataset, obs.scale = 1, var.scale = 1, circle = TRUE)
+               
+             })
+             
+             output$Rotations <- DT::renderDataTable({
+               PCA.dataset$rotation[,1:4]
+             })
 })
 
 # Run the application 
