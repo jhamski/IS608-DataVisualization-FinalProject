@@ -2,6 +2,6 @@ name: ConsumerExpectationsExplorer
 account: jhamski
 server: shinyapps.io
 appId: 102952
-bundleId: 459632
+bundleId: 460700
 url: https://jhamski.shinyapps.io/ConsumerExpectationsExplorer/
-when: 1463969119.96951
+when: 1464038315.31906

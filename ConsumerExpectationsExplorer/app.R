@@ -77,13 +77,17 @@ ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
                          ),
                          mainPanel(
                            plotOutput("seasonal")
-                         )
+                         ), 
+                         fluidRow(column(12, p("This page performs a seasonal decomposition on the selected timeseries using the", 
+                                               a("Seasonal Decomposition of Time Series by Loess (stl)", href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/stl.html", target="_blank"), "function.")))
                          ),
                 tabPanel("PCA",
-                         fluidRow(column(12,
+                         fluidRow(column(6,
                            selectInput("question.PCA", label = h5("Select Timeseries"), 
                                        choices = unique(data.demo$Question))
-                           )),
+                           ),
+                           column(6, p("This section performs a Principle Component Analysis (PCA) on the selected timeseries 
+                                       with demographic breakouts using the", a("prcomp", href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html", target="_blank"), "function."))),
                          fluidRow(column(12,
                            plotOutput("PCA")
                           )), 
