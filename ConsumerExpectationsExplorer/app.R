@@ -66,7 +66,6 @@ ui <- shinyUI(navbarPage("FRBNY Consumer Expectations Survey Explorer",
             ),
             
             tabPanel("Analysis", fluidPage(
-              headerPanel("Statistical Analysis"),
               tabsetPanel(
                 tabPanel("Seasonality",
                          sidebarPanel(
